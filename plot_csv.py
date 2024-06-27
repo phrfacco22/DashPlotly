@@ -56,6 +56,42 @@ fig.add_trace(go.Bar(
     # name=df_orgaos['Unnamed: 0']
 ))
 
+# Add dropdown
+fig.update_layout(
+    updatemenus=[
+        dict(
+            buttons=list([
+                dict(
+                    args=["type", "bar-plot"],
+                    label="Valor",
+                    method="restyle"
+                ),
+                dict(
+                    args=["type", "bar-plot"],
+                    label="Quantidade",
+                    method="restyle"
+                )
+            ]),
+            direction="down",
+            pad={"r": 10, "t": 10},
+            showactive=True,
+            x=0.1,
+            xanchor="left",
+            y=1.1,
+            yanchor="top"
+        ),
+    ]
+)
+
+# Add annotation
+fig.update_layout(
+    annotations=[
+        dict(text="Tipo de Gráfico:", showarrow=False,
+        x=0, y=1.085, yref="paper", align="left")
+    ]
+)
+
+
 fig.update_layout(
     title="Gráfico de Entradas x Saídas",
     xaxis_title="Entradas",
@@ -67,29 +103,51 @@ app = Dash()
  
 app.layout = html.Div([
     
-    
-    dcc.Graph(id='bar-plot', figure=fig),
+     dcc.Tabs([
+        dcc.Tab(label='Gráfico Valor', children=[
+            dcc.Graph(
+                figure={
+                    'data': [
+                        {'x': df_orgaos['Unnamed: 1'], 'y': df_orgaos['Unnamed: 2'],
+                        'type': 'bar'}
+                    ]
+                }
+            )
+        ]),
+        dcc.Tab(label='Gráfico Quantidade', children=[
+            dcc.Graph(
+                figure={
+                    'data': [
+                        {'x': df_valores['Unnamed: 1'], 'y': df_valores['Unnamed: 2'],
+                        'type': 'bar'}
+                    ]
+                }
+            )
+        ])
+    ]),
+
+    # dcc.Graph(id='bar-plot', figure=fig),
     
     html.Label("Filtro de Valor de Entradas (Eixo X)"),
     dcc.RangeSlider(
-    id='x-range-slider',
-    min=df_orgaos['Unnamed: 1'].min(),
-    max=df_orgaos['Unnamed: 1'].max(),
-    step=0.1,
-    marks=None,
-    value=[df_orgaos['Unnamed: 1'].min(), df_orgaos['Unnamed: 1'].max()],
-    tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
+        id='x-range-slider',
+        min=df_orgaos['Unnamed: 1'].min(),
+        max=df_orgaos['Unnamed: 1'].max(),
+        step=0.1,
+        marks=None,
+        value=[df_orgaos['Unnamed: 1'].min(), df_orgaos['Unnamed: 1'].max()],
+        tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
     ),
     
     html.Label("Filtro de Valor de Saídas (Eixo Y)"),
     dcc.RangeSlider(
-    id='y-range-slider',
-    min=df_orgaos['Unnamed: 2'].min(),
-    max=df_orgaos['Unnamed: 2'].max(),
-    step=0.1,
-    marks=None,
-    value=[df_orgaos['Unnamed: 2'].min(), df_orgaos['Unnamed: 2'].max()],
-    tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
+        id='y-range-slider',
+        min=df_orgaos['Unnamed: 2'].min(),
+        max=df_orgaos['Unnamed: 2'].max(),
+        step=0.1,
+        marks=None,
+        value=[df_orgaos['Unnamed: 2'].min(), df_orgaos['Unnamed: 2'].max()],
+        tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
     )
 ])
 
