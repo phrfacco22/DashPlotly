@@ -15,9 +15,12 @@ secretarias_df = secretarias_df.loc[2:25]
 secretarias_df['Unnamed: 1'] = pd.to_numeric(secretarias_df['Unnamed: 1'], errors='coerce')
 secretarias_df['Unnamed: 2'] = pd.to_numeric(secretarias_df['Unnamed: 2'], errors='coerce')
 
+secretarias = list(secretarias_df['Unnamed: 0'])
+locais = list(df_qtd['Unnamed: 0'])
+
 df_qtd = df_qtd.loc[1:20]
-df_qtd['Unnamed: 1'] = pd.to_numeric(df_qtd['Unnamed: 1'], errors='coerce')
-df_qtd['Unnamed: 2'] = pd.to_numeric(df_qtd['Unnamed: 2'], errors='coerce')
+df_qtd['Unnamed: 2'] = pd.to_numeric(df_qtd['Unnamed: 1'], errors='coerce')
+df_qtd['Unnamed: 3'] = pd.to_numeric(df_qtd['Unnamed: 2'], errors='coerce')
 
 df_merge = secretarias_df.join(df_qtd, lsuffix='Unnamed: 0', rsuffix='Unnamed: 0')
 
@@ -35,8 +38,8 @@ fig.add_trace(go.Bar(
 ))
 
 fig.add_trace(go.Bar(
-    x=df_qtd['Unnamed: 1'],
-    y=df_qtd['Unnamed: 2'],
+    x=df_qtd['Unnamed: 2'],
+    y=df_qtd['Unnamed: 3'],
     text='Valores',
     hovertemplate=
     '<b>Quantidade de Entrada: </b> %{x}<br>'+
@@ -83,22 +86,22 @@ app.layout = html.Div([
     html.Label("Filtro de Quantidade de Entradas (Eixo X)"),
     dcc.RangeSlider(
         id='x-range-slider-qtd',
-        min=df_qtd['Unnamed: 1'].min(),
-        max=df_qtd['Unnamed: 1'].max(),
+        min=df_qtd['Unnamed: 2'].min(),
+        max=df_qtd['Unnamed: 2'].max(),
         step=0.1,
         marks=None,
-        value=[df_qtd['Unnamed: 1'].min(), df_qtd['Unnamed: 1'].max()],
+        value=[df_qtd['Unnamed: 2'].min(), df_qtd['Unnamed: 2'].max()],
         tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
     ),
 
     html.Label("Filtro de Quantidade de Saídas (Eixo Y)"),
     dcc.RangeSlider(
         id='y-range-slider-qtd',
-        min=df_qtd['Unnamed: 2'].min(),
-        max=df_qtd['Unnamed: 2'].max(),
+        min=df_qtd['Unnamed: 3'].min(),
+        max=df_qtd['Unnamed: 3'].max(),
         step=0.1,
         marks=None,
-        value=[df_qtd['Unnamed: 2'].min(), df_qtd['Unnamed: 2'].max()],
+        value=[df_qtd['Unnamed: 3'].min(), df_qtd['Unnamed: 3'].max()],
         tooltip={"placement": "bottom", "always_visible": False, "style": {"color": "LightSteelBlue", "fontSize": "10px"}}
     )
 ])
@@ -120,16 +123,19 @@ def update_graph(x_range, y_range, x_range_qtd, y_range_qtd):
     ]
 
     filtered_df_qtd = df_qtd[
-        (df_qtd["Unnamed: 1"] >= x_range_qtd[0]) & (df_qtd['Unnamed: 1'] <= x_range_qtd[1]) &
-        (df_qtd["Unnamed: 2"] >= y_range_qtd[0]) & (df_qtd['Unnamed: 2'] <= y_range_qtd[1])
+        (df_qtd["Unnamed: 2"] >= x_range_qtd[0]) & (df_qtd['Unnamed: 2'] <= x_range_qtd[1]) &
+        (df_qtd["Unnamed: 3"] >= y_range_qtd[0]) & (df_qtd['Unnamed: 3'] <= y_range_qtd[1])
     ]
 
     traces = []
 
+
     bar = go.Bar(
         x=filtered_df['Unnamed: 1'],
         y=filtered_df['Unnamed: 2'],
+        text=secretarias,
         hovertemplate=
+        '<b>%{text}</b><br>'+
         '<b>Valor de Entradas: </b> %{x}<br>'+
         '<b>Valor de Saídas: </b> %{y}<br>',
         visible=True,
@@ -138,9 +144,11 @@ def update_graph(x_range, y_range, x_range_qtd, y_range_qtd):
     traces.append(bar)
 
     bar_qtd = go.Bar(
-        x=filtered_df_qtd['Unnamed: 1'],
-        y=filtered_df_qtd['Unnamed: 2'],
+        x=filtered_df_qtd['Unnamed: 2'],
+        y=filtered_df_qtd['Unnamed: 3'],
+        text=locais,
         hovertemplate=
+        '<b>%{text}</b><br>'+
         '<b>Quantidade de Entrada: </b> %{x}<br>'+
         '<b>Quantidade de Saída : </b> %{y}<br>',
         visible=True,
